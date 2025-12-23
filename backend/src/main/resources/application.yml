@@ -1,0 +1,86 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: medical-platform
+  
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/medical_platform?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456  # 如果密码不正确，请修改为正确的MySQL密码
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 如果数据库连接失败，不阻止应用启动（但数据库操作会失败）
+    continue-on-error: true
+    druid:
+      initial-size: 0  # 启动时不立即创建连接，避免启动失败
+      min-idle: 0      # 最小空闲连接数设为0
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: false  # 启动时不测试连接
+      test-on-borrow: false
+      test-on-return: false
+      # 连接失败时不阻止启动
+      break-after-acquire-failure: false
+      connection-error-retry-attempts: 0
+  
+  # Redis配置（可选，如果Redis未启动，应用仍可正常运行）
+  # 代码中已经做了容错处理，Redis不可用时自动降级到直接查询数据库
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    database: 0
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+      # 连接失败时不阻塞，让应用继续启动
+      shutdown-timeout: 0
+  
+  # 修复Swagger 3.0.0与Spring Boot 2.7+的兼容性问题
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.medical.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.medical: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+
+# JWT配置
+jwt:
+  secret: medical-platform-secret-key-2024-this-is-a-very-long-secret-key-for-hs512-algorithm-which-requires-at-least-64-bytes
+  expiration: 86400000  # 24小时（毫秒）
+
+# 文件上传配置
+spring.servlet.multipart:
+  max-file-size: 10MB
+  max-request-size: 10MB
+
+# Swagger配置
+springfox:
+  documentation:
+    swagger-ui:
+      enabled: true
+

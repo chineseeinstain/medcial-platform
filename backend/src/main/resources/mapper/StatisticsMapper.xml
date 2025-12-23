@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.medical.mapper.StatisticsMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="TrendDataResultMap" type="com.medical.dto.TrendDataDTO">
+        <result column="date" property="date" jdbcType="DATE"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="amount" property="amount" jdbcType="DOUBLE"/>
+    </resultMap>
+    
+    <!-- 查询门诊量趋势（查询最近2年的数据，取最近30条） -->
+    <select id="selectOutpatientTrend" resultMap="TrendDataResultMap">
+        SELECT 
+            DATE(visit_date) as date,
+            COUNT(*) as count
+        FROM patient_visit
+        WHERE visit_date >= DATE_SUB(NOW(), INTERVAL 730 DAY)
+        GROUP BY DATE(visit_date)
+        ORDER BY date DESC
+        LIMIT 30
+    </select>
+    
+    <!-- 查询指定日期范围的门诊量趋势 -->
+    <select id="selectOutpatientTrendByDateRange" resultMap="TrendDataResultMap">
+        SELECT 
+            DATE(visit_date) as date,
+            COUNT(*) as count
+        FROM patient_visit
+        WHERE visit_date >= #{startDate} AND visit_date &lt;= #{endDate}
+        GROUP BY DATE(visit_date)
+        ORDER BY date ASC
+    </select>
+    
+</mapper>
+
+
+
+

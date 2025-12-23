@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- MyBatis SQL映射文件 -->
+<!-- namespace: 对应Mapper接口的全限定名 -->
+<mapper namespace="com.medical.mapper.PatientMapper">
+    
+    <!-- 结果映射：将数据库字段映射到Java对象 -->
+    <resultMap id="BaseResultMap" type="Patient">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="patient_id" property="patientId" jdbcType="VARCHAR"/>
+        <result column="visit_date" property="visitDate" jdbcType="DATE"/>
+        <result column="department" property="department" jdbcType="VARCHAR"/>
+        <result column="diagnosis" property="diagnosis" jdbcType="VARCHAR"/>
+        <result column="cost" property="cost" jdbcType="DECIMAL"/>
+    </resultMap>
+    
+    <!-- 查询所有患者 -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT 
+            id,
+            patient_id,
+            visit_date,
+            department,
+            diagnosis,
+            cost
+        FROM patient_visit
+        ORDER BY visit_date DESC
+    </select>
+    
+    <!-- 根据ID查询患者 -->
+    <select id="selectById" parameterType="Long" resultMap="BaseResultMap">
+        SELECT 
+            id,
+            patient_id,
+            visit_date,
+            department,
+            diagnosis,
+            cost
+        FROM patient_visit
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 插入患者 -->
+    <insert id="insert" parameterType="Patient" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO patient_visit (
+            patient_id,
+            visit_date,
+            department,
+            diagnosis,
+            cost
+        ) VALUES (
+            #{patientId},
+            #{visitDate},
+            #{department},
+            #{diagnosis},
+            #{cost}
+        )
+    </insert>
+    
+    <!-- 更新患者信息 -->
+    <update id="update" parameterType="Patient">
+        UPDATE patient_visit
+        SET 
+            patient_id = #{patientId},
+            visit_date = #{visitDate},
+            department = #{department},
+            diagnosis = #{diagnosis},
+            cost = #{cost}
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除患者 -->
+    <delete id="deleteById" parameterType="Long">
+        DELETE FROM patient_visit
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 根据患者ID查询所有就诊记录 -->
+    <select id="selectByPatientId" parameterType="String" resultMap="BaseResultMap">
+        SELECT 
+            id,
+            patient_id,
+            visit_date,
+            department,
+            diagnosis,
+            cost
+        FROM patient_visit
+        WHERE patient_id = #{patientId}
+        ORDER BY visit_date DESC
+    </select>
+    
+</mapper>
+
